@@ -1,5 +1,5 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <?php
+ob_start(); // Inicia el buffer de salida
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -29,17 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             switch ($usuario['rol']) {
                 case 'paciente':
                     header('Location: ./Pacientes/principal_pacientes.php');
-                    break;
+                    exit;
                 case 'doctor':
                     header('Location: ./Doctores/principal_doctores.php');
-                    break;
+                    exit;
                 case 'administrador':
                     header('Location: ./Admin/principalAdmin.php');
-                    break;
+                    exit;
                 default:
                     echo 'Rol desconocido.';
+                    exit;
             }
-            exit;
         } else {
             $error = 'Credenciales incorrectas.';
         }
@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Error en la consulta: ' . $e->getMessage();
     }
 }
+ob_end_flush(); // Enviar el buffer de salida
 ?>
 
 <!DOCTYPE html>
