@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contrasena = $_POST['contrasena'];
 
     // Verificar que la conexión se haya establecido
-    if (!isset($pdo)) {
+    if (!$pdo) {
         die('No se pudo conectar a la base de datos.');
     }
 
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['email' => $email]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($usuario && password_verify($contrasena, $usuario['contrasena'])) {
+        if ($usuario && $contrasena === $usuario['contrasena']) {
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['rol'] = $usuario['rol'];
 
@@ -29,16 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             switch ($usuario['rol']) {
                 case 'paciente':
                     header('Location: ./Pacientes/principal_pacientes.php');
-                    exit;
+                    break;
                 case 'doctor':
                     header('Location: ./Doctores/principal_doctores.php');
-                    exit;
+                    break;
                 case 'administrador':
                     header('Location: ./Admin/principalAdmin.php');
-                    exit;
+                    break;
                 default:
                     echo 'Rol desconocido.';
             }
+            exit;
         } else {
             $error = 'Credenciales incorrectas.';
         }
