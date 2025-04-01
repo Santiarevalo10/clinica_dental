@@ -1,6 +1,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require './Conexion/conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -8,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contrasena = $_POST['contrasena'];
 
     // Verificar que la conexión se haya establecido
-    if (!$pdo) {
+    if (!isset($pdo)) {
         die('No se pudo conectar a la base de datos.');
     }
 
@@ -18,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['email' => $email]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($usuario && $contrasena === $usuario['contrasena']) {
+        if ($usuario && password_verify($contrasena, $usuario['contrasena'])) {
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['rol'] = $usuario['rol'];
 
@@ -26,17 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             switch ($usuario['rol']) {
                 case 'paciente':
                     header('Location: ./Pacientes/principal_pacientes.php');
-                    break;
+                    exit;
                 case 'doctor':
                     header('Location: ./Doctores/principal_doctores.php');
-                    break;
+                    exit;
                 case 'administrador':
                     header('Location: ./Admin/principalAdmin.php');
-                    break;
+                    exit;
                 default:
                     echo 'Rol desconocido.';
             }
-            exit;
         } else {
             $error = 'Credenciales incorrectas.';
         }
